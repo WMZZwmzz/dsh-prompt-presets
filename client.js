@@ -956,7 +956,7 @@ window.__ModuleLoader__.load({
           if (first !== undefined) focusLabel(first.id)
           return
         }
-        // A custom preset is the whole system prompt; an empty one would erase it.
+        // A custom preset replaces the persona/identity; an empty one would erase it.
         const emptyText = draft.customs.find(preset => preset.text.trim() === '')
         if (emptyText !== undefined) {
           setMessage('emptyText')

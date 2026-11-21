@@ -4,7 +4,8 @@
  * Owns one per-session `promptPreset` projection folded from the plugin's own
  * `command/run`/`command/done` records, the `/prompt-preset <id>` command the
  * composer chip and the Settings page submit, and a `system-prompt/assemble`
- * listener that turns a custom preset into the session's whole system prompt.
+ * listener that replaces the session's persona/identity with a custom preset
+ * while keeping DSH's runtime sections by default.
  *
  * `presets` and `defaultPreset` are volatile Config fields: the Settings page
  * edits them live through the profile settings document, and every read below
@@ -39,7 +40,8 @@ export const Config = z.object({
   /**
    * The preset table. `default` is reserved for the built-in passthrough that
    * leaves DSH's assembled prompt untouched; every other preset's text
-   * replaces the whole system prompt.
+   * replaces DSH's persona/identity, and DSH's runtime sections are kept
+   * unless `keepDshMechanics` is off.
    */
   presets: z.array(z.object({
     id: z.string().required().pattern(PRESET_ID_PATTERN),
