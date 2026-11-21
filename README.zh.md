@@ -34,7 +34,7 @@
 - **位置** — 一个 `conversation.input.left` 插槽条目；按钮带 `order: 2`，所以在已安装的 `claude-style` 皮肤下位于权限组（`order: 1`）和命令加号按钮（`order: 3`）之间。没有该皮肤时这一行没有显式 order，按钮停在权限/计划控件右侧。
 - **状态** — 一个 Host 会话投影 `promptPreset`，由插件自己的 `/prompt-preset <id>` 命令记录（`command/run` + `command/done`）折叠而来。选择保存在会话日志里，重新打开或恢复会话会恢复它；其他会话各自保留自己的选择。
 - **预设来源** — `prompt-presets` Host 行的实时设置表单。按钮和设置页读取同一份值，所以保存的修改会立即到达输入框。
-- **系统提示词** — 一个前置（prepend）的 `system-prompt/assemble` 监听器。当会话选中的是自定义预设时，它用预设文本替换 DSH 的人格/身份 section（`plugin:prompt-preset`，`interpolate: false`）。`keepDshMechanics` 开启时（默认），DSH 的非人格 section——计划模式、PTC SDK、工具规范、Web 安全、文件引用、MCP 说明——会保留在预设文本之后，所以模式和工具行为照常工作；关闭后才是完全整段替换。`keepDshBasics` 开启时（默认），会先附加一段简短的 `DSH_BASICS_TEXT` 前言——身份、工具使用说明和环境提示。内置 `default` 预设不修改组装结果，即使用 DSH 自己的提示词。子代理会话（session header `origin: 'subagent'`）也会跳过。
+- **系统提示词** — 一个前置（prepend）的 `system-prompt/assemble` 监听器。当会话选中的是自定义预设时，它用预设文本替换 DSH 的人格/身份 section（`plugin:prompt-preset`，`interpolate: false`）。`keepDshMechanics` 开启时（默认），DSH 的非人格 section——计划模式、PTC SDK、工具规范、Web 安全、文件引用、MCP 说明——会保留在预设文本之后，所以模式和工具行为照常工作；关闭它并关闭基础信息后，才是完全整段替换。`keepDshBasics` 开启时（默认），会先附加一段简短的 `DSH_BASICS_TEXT` 前言——身份、工具使用说明和环境提示。内置 `default` 预设不修改组装结果，即使用 DSH 自己的提示词。子代理会话（session header `origin: 'subagent'`）也会跳过。
 - **子代理** — 子代理会话不记录选择，会被跳过，所以保留 DSH 自己的系统提示词。
 - **缓存** — 切换会重写系统提示词，缓存的请求前缀可能失效。
 - **回执** — 每次切换都会执行一条真实的会话命令，所以对话里会出现一条命令回执（`prompt-preset`，摘要为预设名称），与 DSH 自带的 `/permission` 切换行为一致。
@@ -44,7 +44,7 @@
 **设置 → 系统提示词预设** 用于编辑预设列表：
 
 - **DSH 原有提示词 / DSH original prompt**（内置、锁定）：不修改 DSH 组装好的系统提示词。不可删除、不可填写文本；页面会清除配置里给它写的文本，并保留已存储的名称。
-- **保留 DSH 运行机制**（可选项，默认开启）：在自定义预设之后保留 DSH 的非人格 section——计划模式、PTC SDK、工具规范、Web 安全、文件引用、MCP 说明。关闭后预设文本就是完整的系统提示词。
+- **保留 DSH 运行机制**（可选项，默认开启）：在自定义预设之后保留 DSH 的非人格 section——计划模式、PTC SDK、工具规范、Web 安全、文件引用、MCP 说明。关闭后预设文本（连同开启的基础信息）就是完整的系统提示词。
 - **自定义预设的基础信息**（可选项）：在每个自定义预设前保留一段简短的 DSH 前言。页面会展示原文（身份、工具说明、环境提示）；它只是摘要，不能替代上面的运行机制选项。
 - **自定义预设**：名称 + **系统提示词**（选中后替换 DSH 的人格/身份；除非关闭运行机制，否则运行 section 保留）、添加/删除，以及 **设为默认** 单选。名称必须唯一，提示词文本不能为空；空文本会清空自定义提示词。
 - **保存** 通过 profile 设置文档原子写入 `presets`、`defaultPreset`、`keepDshBasics` 和 `keepDshMechanics`，重启后仍然有效。**还原** 恢复到上次保存的值。与其他页面冲突时会保留草稿并提示再次保存。
