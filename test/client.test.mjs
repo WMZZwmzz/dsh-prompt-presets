@@ -48,6 +48,8 @@ assert.ok(
   source.includes('const BASICS_TEXT = ' + JSON.stringify(DSH_BASICS_TEXT)),
   'the Settings preview text matches DSH_BASICS_TEXT in lib/model.js',
 )
+assert.ok(source.includes("'settings.mechanicsToggle'"), 'the Settings page exposes the runtime-mechanics toggle')
+assert.ok(source.includes("path: ['keepDshMechanics']"), 'saving writes the runtime-mechanics option')
 
 const reactStub = {
   createElement() { throw new Error('renderer not under test') },
@@ -170,6 +172,10 @@ assert.equal(dictionaries.length, 1)
 assert.equal(dictionaries[0].ns, 'promptPresets')
 assert.ok(dictionaries[0].dicts.zh && dictionaries[0].dicts.en, 'registers both baseline locales')
 assert.ok(dictionaries[0].dicts.zh['settings.nav'], 'adds settings copy')
+for (const key of ['settings.mechanicsTitle', 'settings.mechanicsDescription', 'settings.mechanicsToggle']) {
+  assert.ok(dictionaries[0].dicts.zh[key], `adds Chinese ${key}`)
+  assert.ok(dictionaries[0].dicts.en[key], `adds English ${key}`)
+}
 
 assert.deepEqual(servedNamespaces, ['prompt-presets'])
 assert.deepEqual(slotInjects.sort(), ['conversation.input.left', 'settings.section', 'settings.section.icon'])

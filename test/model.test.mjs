@@ -8,8 +8,11 @@ import {
   COMMAND_NAME,
   DSH_BASICS_TEXT,
   KEEP_DSH_BASICS_DEFAULT,
+  KEEP_DSH_MECHANICS_DEFAULT,
+  PRESET_SECTION_NAME,
   PROJECTION_KEY,
   STATE_VERSION,
+  buildPromptSections,
   commandAction,
   completePromptText,
   createStateSchema,
@@ -17,6 +20,7 @@ import {
   effectivePresetId,
   foldEvent,
   initialState,
+  isReplacedSection,
   normalizeConfig,
   unwrapVolatile,
   viewOf,
@@ -96,12 +100,16 @@ test('Config: defaults, volatile refs, and schema validation', () => {
   assert.deepEqual(unwrapVolatile(empty.presets), [{ id: 'default', label: BUILTIN_PRESET_LABEL, text: '' }])
   assert.equal(unwrapVolatile(empty.defaultPreset), 'default')
   assert.equal(unwrapVolatile(empty.keepDshBasics), true)
+  assert.equal(unwrapVolatile(empty.keepDshMechanics), true)
   assert.equal(unwrapVolatile(Config({ keepDshBasics: false }).keepDshBasics), false)
+  assert.equal(unwrapVolatile(Config({ keepDshMechanics: false }).keepDshMechanics), false)
   assert.equal(KEEP_DSH_BASICS_DEFAULT, true)
+  assert.equal(KEEP_DSH_MECHANICS_DEFAULT, true)
 
   assert.throws(() => Config({ presets: [{ id: 'Bad Id', label: 'x' }] }))
   assert.throws(() => Config({ presets: [{ id: 'ok' }] }))
   assert.throws(() => Config({ keepDshBasics: 'yes' }))
+  assert.throws(() => Config({ keepDshMechanics: 'yes' }))
 })
 
 test('config: falls back to a single default preset', () => {
@@ -110,6 +118,7 @@ test('config: falls back to a single default preset', () => {
   assert.equal(cfg.defaultPreset, 'default')
   assert.equal(cfg.presets[0].text, '')
   assert.equal(cfg.keepDshBasics, true)
+  assert.equal(cfg.keepDshMechanics, true)
 })
 
 test('config: valid presets and derived maps', () => {
@@ -117,7 +126,9 @@ test('config: valid presets and derived maps', () => {
   assert.equal(cfg.presets.length, 2)
   assert.equal(cfg.byId.get('concise').text, 'Keep answers short.')
   assert.equal(cfg.keepDshBasics, true)
+  assert.equal(cfg.keepDshMechanics, true)
   assert.equal(configOf({ keepDshBasics: false }).keepDshBasics, false)
+  assert.equal(configOf({ keepDshMechanics: false }).keepDshMechanics, false)
   assert.deepEqual(cfg.views, [{ id: 'default', label: 'Default' }, { id: 'concise', label: 'Concise' }])
 })
 
@@ -132,6 +143,7 @@ test('config: rejects malformed input', () => {
     { presets: [{ id: 'a', label: 'x', text: '' }] },
     { presets: [{ id: 'a', label: 'x' }], defaultPreset: 'missing' },
     { presets: [{ id: 'a', label: 'x', text: 't' }], keepDshBasics: 'yes' },
+    { presets: [{ id: 'a', label: 'x', text: 't' }], keepDshMechanics: 'yes' },
   ]
   for (const value of bad) assert.throws(() => normalizeConfig(value), TypeError)
 })
@@ -175,6 +187,54 @@ test('prompt text: passthrough, basics on by default, exact replacement when off
   assert.equal(completePromptText(on, { current: 'concise' }), DSH_BASICS_TEXT + '\n\nKeep answers short.')
   assert.equal(completePromptText(off, { current: 'concise' }), 'Keep answers short.')
   assert.equal(completePromptText(on, null), undefined)
+})
+
+test('prompt sections: replace identity/persona and preserve DSH mechanics by default', () => {
+  const assembled = [
+    { name: 'harness:identity', text: 'You are DSH.', interpolate: false },
+    { name: 'deployment:persona-prefix', text: 'You are a coding agent.' },
+    { name: 'plan:policy', text: 'Stay in plan mode.' },
+    { name: 'tool:read', text: 'Use read.' },
+    { name: 'tools:sdk', text: 'declare tools' },
+    { name: 'ui:deliverable-file-references', text: 'link files' },
+    { name: 'plugin:prompt-preset', text: 'stale preset section' },
+  ]
+  const on = configOf()
+  const off = configOf({ keepDshMechanics: false })
+
+  assert.equal(isReplacedSection('harness:identity'), true)
+  assert.equal(isReplacedSection('deployment:persona-prefix'), true)
+  assert.equal(isReplacedSection('deployment:persona-suffix'), true)
+  assert.equal(isReplacedSection('deployment:persona-extra'), true)
+  assert.equal(isReplacedSection('plan:policy'), false)
+  assert.equal(isReplacedSection('tool:read'), false)
+  assert.equal(isReplacedSection(null), false)
+
+  assert.equal(buildPromptSections(on, { current: 'default' }, assembled), undefined)
+
+  const kept = buildPromptSections(on, { current: 'concise' }, assembled)
+  assert.deepEqual(kept.map(section => section.name), [
+    PRESET_SECTION_NAME,
+    'plan:policy',
+    'tool:read',
+    'tools:sdk',
+    'ui:deliverable-file-references',
+  ])
+  assert.deepEqual(kept[0], {
+    name: PRESET_SECTION_NAME,
+    text: DSH_BASICS_TEXT + '\n\nKeep answers short.',
+    interpolate: false,
+  })
+  assert.deepEqual(kept[1], { name: 'plan:policy', text: 'Stay in plan mode.' })
+
+  const exact = buildPromptSections(off, { current: 'concise' }, assembled)
+  assert.deepEqual(exact.map(section => section.name), [PRESET_SECTION_NAME])
+
+  const noBasics = buildPromptSections(configOf({ keepDshBasics: false }), { current: 'concise' }, assembled)
+  assert.equal(noBasics[0].text, 'Keep answers short.')
+
+  // The helper tolerates a malformed section list without crashing assembly.
+  assert.deepEqual(buildPromptSections(on, { current: 'concise' }, undefined).map(section => section.name), [PRESET_SECTION_NAME])
 })
 
 test('fold: an errored command keeps the previous preset', () => {
@@ -265,32 +325,54 @@ test('apply: wires the projection, command, prompt replacement, and settings pol
     missing: false,
   })
 
+  const dshSections = () => [
+    { name: 'harness:identity', text: 'DSH prompt', interpolate: false },
+    { name: 'deployment:persona-prefix', text: 'You are a coding agent.' },
+    { name: 'tool:read', text: 'Use read.' },
+    { name: 'plan:policy', text: 'Plan rules.' },
+  ]
   const presentation = () => ({
-    sections: [{ name: 'harness:identity', text: 'DSH prompt' }],
+    sections: dshSections(),
     contexts: [{ name: 'working-directory:current', text: '/repo' }],
     variables: { model: 'm' },
   })
   const passage = async () => presentation()
   const assemble = session => captured.on.listener({}, { agent: { session } }, passage)
-  const dshPrompt = { sections: [{ name: 'harness:identity', text: 'DSH prompt' }] }
+  const dshPrompt = { sections: dshSections() }
+  const keptSectionNames = [PRESET_SECTION_NAME, 'tool:read', 'plan:policy']
 
   // The built-in preset is a passthrough; the assembly comes back untouched.
   state.current = 'default'
   assert.deepEqual((await assemble({ header: {} })).sections, dshPrompt.sections)
 
-  // A custom preset replaces the whole section list but keeps contexts/tools.
+  // A custom preset replaces identity/persona, keeps DSH mechanics, and keeps contexts/tools.
   state.current = 'concise'
   const replaced = await assemble({ header: {} })
-  assert.deepEqual(replaced.sections, [{ name: 'plugin:prompt-preset', text: DSH_BASICS_TEXT + '\n\nKeep answers short.', interpolate: false }])
+  assert.deepEqual(replaced.sections, [
+    { name: 'plugin:prompt-preset', text: DSH_BASICS_TEXT + '\n\nKeep answers short.', interpolate: false },
+    { name: 'tool:read', text: 'Use read.' },
+    { name: 'plan:policy', text: 'Plan rules.' },
+  ])
+  assert.deepEqual(replaced.sections.map(section => section.name), keptSectionNames)
   assert.deepEqual(replaced.contexts, [{ name: 'working-directory:current', text: '/repo' }])
   assert.deepEqual(replaced.variables, { model: 'm' })
 
-  // Turning the basics option off keeps the exact preset text.
+  // Turning the basics option off keeps the exact preset text but still keeps mechanics.
   liveConfig.keepDshBasics = false
   assert.deepEqual((await assemble({ header: {} })).sections, [
     { name: 'plugin:prompt-preset', text: 'Keep answers short.', interpolate: false },
+    { name: 'tool:read', text: 'Use read.' },
+    { name: 'plan:policy', text: 'Plan rules.' },
   ])
   liveConfig.keepDshBasics = true
+
+  // Turning mechanics off restores the complete replacement.
+  liveConfig.keepDshMechanics = false
+  assert.deepEqual((await assemble({ header: {} })).sections, [
+    { name: 'plugin:prompt-preset', text: DSH_BASICS_TEXT + '\n\nKeep answers short.', interpolate: false },
+  ])
+  liveConfig.keepDshMechanics = true
+  assert.deepEqual((await assemble({ header: {} })).sections.map(section => section.name), keptSectionNames)
 
   // Subagent sessions keep their own prompt, and diagnostics have no agent.
   assert.deepEqual((await assemble({ header: { origin: 'subagent' } })).sections, dshPrompt.sections)
@@ -303,9 +385,8 @@ test('apply: wires the projection, command, prompt replacement, and settings pol
   ]
   liveConfig.defaultPreset = 'detailed'
   state.current = 'detailed'
-  assert.deepEqual((await assemble({ header: {} })).sections, [
-    { name: 'plugin:prompt-preset', text: DSH_BASICS_TEXT + '\n\nExplain every step.', interpolate: false },
-  ])
+  assert.deepEqual((await assemble({ header: {} })).sections.map(section => section.name), keptSectionNames)
+  assert.equal((await assemble({ header: {} })).sections[0].text, DSH_BASICS_TEXT + '\n\nExplain every step.')
   assert.deepEqual(captured.command.handler({ rawInput: 'detailed' }), { kind: 'success', text: 'Detailed' })
   assert.equal(captured.command.handler({ rawInput: 'concise' }).kind, 'error')
   assert.equal(captured.definition.wire.view({ current: 'gone', pending: null }).current, 'detailed')

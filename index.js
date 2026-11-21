@@ -19,11 +19,12 @@ import {
   BUILTIN_PRESET_LABEL,
   COMMAND_NAME,
   KEEP_DSH_BASICS_DEFAULT,
+  KEEP_DSH_MECHANICS_DEFAULT,
   PRESET_ID_PATTERN,
   PROJECTION_KEY,
   STATE_VERSION,
+  buildPromptSections,
   commandAction,
-  completePromptText,
   createStateSchema,
   createViewSchema,
   foldEvent,
@@ -52,6 +53,12 @@ export const Config = z.object({
    * environment pointer) to every custom preset. The Settings page owns it.
    */
   keepDshBasics: z.boolean().default(KEEP_DSH_BASICS_DEFAULT).volatile(),
+  /**
+   * Keep DSH's non-persona operating sections (plan mode, PTC, tool guidance,
+   * web safety, file references, MCP instructions) after every custom preset.
+   * Off makes the preset text the complete system prompt.
+   */
+  keepDshMechanics: z.boolean().default(KEEP_DSH_MECHANICS_DEFAULT).volatile(),
 })
 
 /** Services this plugin needs; absent ones keep it inactive instead of failing. */
@@ -71,6 +78,7 @@ export async function apply(ctx, config) {
     presets: unwrapVolatile(raw.presets),
     defaultPreset: unwrapVolatile(raw.defaultPreset),
     keepDshBasics: unwrapVolatile(raw.keepDshBasics),
+    keepDshMechanics: unwrapVolatile(raw.keepDshMechanics),
   })
 
   // Fail loud on a broken boot config; tolerate a later live edit the Settings
@@ -81,7 +89,8 @@ export async function apply(ctx, config) {
   const currentConfig = () => {
     const next = readRaw()
     if (next.presets === read.presets && next.defaultPreset === read.defaultPreset
-      && next.keepDshBasics === read.keepDshBasics) return current
+      && next.keepDshBasics === read.keepDshBasics
+      && next.keepDshMechanics === read.keepDshMechanics) return current
     try {
       current = normalizeConfig(next)
       read = next
@@ -118,22 +127,25 @@ export async function apply(ctx, config) {
     handler: invocation => commandAction(currentConfig(), invocation.rawInput),
   })
 
-  // A custom preset is the session's complete system prompt: after every other
-  // listener has contributed, replace the assembled section list with its text.
-  // The built-in `default` preset leaves the assembly untouched, and subagent
-  // sessions keep their own prompt (they have no picker and their role text
-  // must survive). A complete section registered by another plugin still wins,
-  // because the prompt registry restores it after this waterfall.
+  // A custom preset replaces DSH's persona/identity. With `keepDshMechanics`
+  // on (the default), every other section — plan mode, PTC, tool guidance,
+  // web safety, file references, MCP instructions — is preserved after the
+  // preset text; turning it off makes the preset the complete prompt. The
+  // built-in `default` preset leaves the assembly untouched, and subagent
+  // sessions keep their own prompt. A complete section registered by another
+  // plugin still wins, because the registry restores it after this waterfall.
   let promptWarned = false
   ctx.on('system-prompt/assemble', async (_assembly, context, next) => {
     const agent = context === undefined || context === null ? undefined : context.agent
     const session = agent === undefined || agent === null ? undefined : agent.session
     const subagent = session !== undefined && session !== null && session.header !== undefined
       && session.header !== null && session.header.origin === 'subagent'
-    let text
+    let state
+    let config
     if (session !== undefined && session !== null && !subagent) {
       try {
-        text = completePromptText(currentConfig(), handle.stateOf(session))
+        config = currentConfig()
+        state = handle.stateOf(session)
       } catch (error) {
         if (!promptWarned) {
           promptWarned = true
@@ -142,11 +154,18 @@ export async function apply(ctx, config) {
       }
     }
     const result = await next()
-    if (text === undefined) return result
-    return {
-      ...result,
-      sections: [{ name: 'plugin:prompt-preset', text, interpolate: false }],
+    if (state === undefined) return result
+    let sections
+    try {
+      sections = buildPromptSections(config, state, result.sections)
+    } catch (error) {
+      if (!promptWarned) {
+        promptWarned = true
+        ctx.logger.warn(`prompt-presets: prompt replacement skipped: ${String(error)}`)
+      }
     }
+    if (sections === undefined) return result
+    return { ...result, sections }
   }, { prepend: true })
 
   // This plugin ships its own Settings page; suppress any auto-generated form.
@@ -165,5 +184,5 @@ export async function apply(ctx, config) {
     child.effect(() => () => clearTimeout(timer), 'prompt-presets: settings describe')
   })
 
-  ctx.logger.info(`prompt-presets: ${String(current.presets.length)} preset(s), default ${JSON.stringify(current.defaultPreset)}`)
+  ctx.logger.info(`prompt-presets: ${String(current.presets.length)} preset(s), default ${JSON.stringify(current.defaultPreset)}, mechanics ${current.keepDshMechanics ? 'on' : 'off'}`)
 }

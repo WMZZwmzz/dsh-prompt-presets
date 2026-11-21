@@ -42,7 +42,7 @@ window.__ModuleLoader__.load({
       'trigger.title': '切换当前会话的系统提示词预设',
       'menu.label': '系统提示词预设',
       'menu.title': '系统提示词预设',
-      'menu.hint': '自定义预设会整段替换系统提示词；在「设置 → 系统提示词预设」中管理',
+      'menu.hint': '自定义预设默认只替换人格/身份并保留 DSH 运行机制；在「设置 → 系统提示词预设」中管理',
       'missing.fallback': '原预设已从配置中移除，当前回退到默认预设',
       'announce.switched': '已切换到 {name}',
       'error.failed': '切换失败，请重试',
@@ -50,9 +50,12 @@ window.__ModuleLoader__.load({
       'error.unconfirmed': '切换未确认，请重试',
       'settings.nav': '系统提示词预设',
       'settings.title': '系统提示词预设',
-      'settings.description': '自定义预设的文本会替换 DSH 原有的系统提示词（不是追加）。默认会在预设文本前附加一段简短的 DSH 基础信息（身份、工具说明、运行环境），可在下方关闭。内置的「DSH 原有提示词」不做替换。保存后写入当前 profile；「设为默认」的预设用于新建会话，当前会话请在输入框底部的预设按钮中切换。',
+      'settings.description': '自定义预设的文本会替换 DSH 的人格/身份段落（不是追加）。默认保留 DSH 的运行机制段落（计划模式、PTC、工具规范、Web 安全、文件引用），可在下方关闭；还可选择是否附加一段简短的 DSH 基础信息。内置的「DSH 原有提示词」不做替换。保存后写入当前 profile；「设为默认」的预设用于新建会话，当前会话请在输入框底部的预设按钮中切换。',
+      'settings.mechanicsTitle': '保留 DSH 运行机制',
+      'settings.mechanicsDescription': '开启后，自定义预设只替换人格/身份，DSH 的计划模式、PTC、工具规范、Web 安全、文件引用等运行段落会保留；关闭后预设文本就是完整的系统提示词。',
+      'settings.mechanicsToggle': '保留 DSH 的运行机制段落',
       'settings.basicsTitle': '自定义预设的基础信息',
-      'settings.basicsDescription': '开启后，每个自定义预设的文本前都会附加下面这段内容；关闭后，预设文本就是全部系统提示词。',
+      'settings.basicsDescription': '开启后，每个自定义预设的文本前都会附加下面这段内容；关闭后不附加。这段只是简短摘要，不包含运行机制段落。',
       'settings.basicsToggle': '保留简短的 DSH 基础信息',
       'settings.basicsPreviewLabel': '附加内容',
       'settings.builtinBadge': '内置',
@@ -60,14 +63,14 @@ window.__ModuleLoader__.load({
       'settings.builtinDescription': '不做替换：直接使用 DSH 原本的系统提示词。',
       'settings.builtinWarning': '配置里的内置项带有文本；保存会清空它。内置项始终代表 DSH 原有提示词，需要自定义内容请新建预设。',
       'settings.customTitle': '自定义预设',
-      'settings.customDescription': '每个自定义预设都会整段替换 DSH 的提示词；默认在前面附加一段简短的 DSH 基础信息，关闭后则完全使用你的文本。「设为默认」用于新会话；删除预设后，正在使用它的会话会回退到默认预设。',
+      'settings.customDescription': '每个自定义预设替换 DSH 的人格/身份；默认保留运行机制段落，并可在前面附加一段简短的 DSH 基础信息。关闭「保留 DSH 运行机制」后，预设文本才会整段替换提示词。「设为默认」用于新会话；删除预设后，正在使用它的会话会回退到默认预设。',
       'settings.customEmpty': '还没有自定义预设。',
       'settings.add': '添加预设',
       'settings.newLabel': '新预设',
       'settings.label': '名称',
       'settings.labelPlaceholder': '例如：简洁、代码审查',
       'settings.text': '系统提示词',
-      'settings.textPlaceholder': '粘贴完整的系统提示词；切换到此预设后会整段替换 DSH 原有的提示词……',
+      'settings.textPlaceholder': '粘贴系统提示词；默认保留 DSH 运行机制，关闭后会整段替换 DSH 原有的提示词……',
       'settings.makeDefault': '设为默认',
       'settings.delete': '删除',
       'settings.save': '保存',
@@ -78,10 +81,10 @@ window.__ModuleLoader__.load({
       'settings.failed': '保存失败：配置可能已被其他页面改动。草稿已保留，请再次保存以覆盖。',
       'settings.invalidLabel': '预设名称不能为空。',
       'settings.duplicateLabel': '预设名称不能重复。',
-      'settings.emptyText': '自定义预设的提示词不能为空：它会被用作完整的系统提示词。',
+      'settings.emptyText': '自定义预设的提示词不能为空：它会替换人格/身份段落。',
       'settings.loading': '加载中…',
       'settings.unavailable': '当前 Host 不提供这项设置。',
-      'settings.note': '保存会写入当前 profile 配置，并覆盖插件自带的默认值。基础信息只是很短的摘要，DSH 原有的工具说明和环境细节不会完整保留，请把模型必须知道的内容写进预设。',
+      'settings.note': '保存会写入当前 profile 配置，并覆盖插件自带的默认值。「保留 DSH 运行机制」默认开启，会保留计划模式、PTC、工具规范、Web 安全和文件引用；关闭后预设文本就是完整提示词。基础信息只是很短的摘要，请把模型必须知道的内容写进预设。使用 complete persona 的智能体预设（如 minimal）会覆盖本插件，机制保留也不会生效。',
     }
 
     const en = {
@@ -89,7 +92,7 @@ window.__ModuleLoader__.load({
       'trigger.title': 'Switch the system prompt preset for this session',
       'menu.label': 'Prompt presets',
       'menu.title': 'Prompt presets',
-      'menu.hint': 'Custom presets replace the whole system prompt; manage them in Settings → Prompt presets',
+      'menu.hint': 'Custom presets replace the persona/identity and keep DSH runtime mechanics by default; manage them in Settings → Prompt presets',
       'missing.fallback': 'The selected preset was removed from the config; using the default instead',
       'announce.switched': 'Switched to {name}',
       'error.failed': 'Switch failed. Try again',
@@ -97,9 +100,12 @@ window.__ModuleLoader__.load({
       'error.unconfirmed': 'The switch was not confirmed. Try again',
       'settings.nav': 'Prompt presets',
       'settings.title': 'Prompt presets',
-      'settings.description': "A custom preset's text replaces DSH's whole system prompt (it does not append). By default a short DSH preamble (identity, tool guidance, environment) is prepended; turn that off below for an exact replacement. The built-in DSH original prompt keeps DSH's prompt as-is. Saving writes the current profile; the preset marked as default starts new sessions, and the current session is switched from the preset chip in the composer.",
+      'settings.description': "A custom preset's text replaces DSH's persona/identity (it does not append). By default DSH's runtime sections (plan mode, PTC, tool guidance, web safety, file references) are kept; turn that off below for an exact replacement. You can also prepend a short DSH preamble (identity, tool guidance, environment). The built-in DSH original prompt keeps DSH's prompt as-is. Saving writes the current profile; the preset marked as default starts new sessions, and the current session is switched from the preset chip in the composer.",
+      'settings.mechanicsTitle': 'Keep DSH runtime mechanics',
+      'settings.mechanicsDescription': "When on, a custom preset replaces the persona/identity only; DSH's plan mode, PTC, tool guidance, web safety, file-reference, and MCP sections are kept. When off, the preset text is the complete system prompt.",
+      'settings.mechanicsToggle': 'Keep DSH runtime sections',
       'settings.basicsTitle': 'Basics for custom presets',
-      'settings.basicsDescription': 'When on, the text below is prepended to every custom preset; when off, the preset text is the entire system prompt.',
+      'settings.basicsDescription': 'When on, the text below is prepended to every custom preset; when off, nothing is prepended. This is only a short summary, not the runtime sections.',
       'settings.basicsToggle': 'Keep brief DSH basics',
       'settings.basicsPreviewLabel': 'Prepended text',
       'settings.builtinBadge': 'Built-in',
@@ -107,14 +113,14 @@ window.__ModuleLoader__.load({
       'settings.builtinDescription': "No replacement: uses DSH's original system prompt.",
       'settings.builtinWarning': "The configured built-in preset has text; saving clears it. The built-in entry always means DSH's original prompt; create a preset for custom content.",
       'settings.customTitle': 'Custom presets',
-      'settings.customDescription': "Each custom preset replaces DSH's prompt entirely; the short DSH preamble is prepended by default, and turning it off uses your text alone. Use as default starts new sessions; sessions using a deleted preset fall back to the default.",
+      'settings.customDescription': "Each custom preset replaces DSH's persona/identity; runtime sections are kept by default, and the short DSH preamble can be prepended. Turning off Keep DSH runtime mechanics makes the preset text the complete prompt. Use as default starts new sessions; sessions using a deleted preset fall back to the default.",
       'settings.customEmpty': 'No custom presets yet.',
       'settings.add': 'Add preset',
       'settings.newLabel': 'New preset',
       'settings.label': 'Label',
       'settings.labelPlaceholder': 'For example: Concise, Code review',
       'settings.text': 'System prompt',
-      'settings.textPlaceholder': "Paste the complete system prompt; it replaces DSH's original prompt when this preset is picked…",
+      'settings.textPlaceholder': "Paste the system prompt; DSH runtime mechanics are kept by default, or replaced entirely when that option is off…",
       'settings.makeDefault': 'Use as default',
       'settings.delete': 'Delete',
       'settings.save': 'Save',
@@ -125,10 +131,10 @@ window.__ModuleLoader__.load({
       'settings.failed': 'Save failed: the configuration may have changed elsewhere. Your draft is kept; save again to overwrite.',
       'settings.invalidLabel': 'A preset label is required.',
       'settings.duplicateLabel': 'Preset labels must be unique.',
-      'settings.emptyText': 'A custom preset needs prompt text: it is used as the complete system prompt.',
+      'settings.emptyText': 'A custom preset needs prompt text: it replaces the persona/identity sections.',
       'settings.loading': 'Loading…',
       'settings.unavailable': 'This setting is not available on this host.',
-      'settings.note': "Saving writes the current profile and takes precedence over the plugin's bundled defaults. The basics are only a short summary; DSH's full tool guidance and environment details are not kept, so include anything the model must know in the preset.",
+      'settings.note': "Saving writes the current profile and takes precedence over the plugin's bundled defaults. Keep DSH runtime mechanics is on by default and keeps plan mode, PTC, tool guidance, web safety, and file references; turning it off makes the preset text the complete prompt. The basics are only a short summary, so include anything else the model must know in the preset. An agent preset with a complete persona (for example minimal) still overrides this plugin, even with mechanics on.",
     }
 
     const CSS = `
@@ -811,6 +817,7 @@ window.__ModuleLoader__.load({
         customs,
         defaultPreset: ids.indexOf(value.defaultPreset) >= 0 ? value.defaultPreset : BUILTIN_ID,
         keepDshBasics: value.keepDshBasics !== false,
+        keepDshMechanics: value.keepDshMechanics !== false,
       }
     }
 
@@ -821,6 +828,7 @@ window.__ModuleLoader__.load({
         customs: draft.customs.map(preset => ({ id: preset.id, label: preset.label, text: preset.text })),
         defaultPreset: draft.defaultPreset,
         keepDshBasics: draft.keepDshBasics,
+        keepDshMechanics: draft.keepDshMechanics,
       }
     }
 
@@ -901,6 +909,7 @@ window.__ModuleLoader__.load({
         customs: draft.customs.map(preset => preset.id === id ? { ...preset, text } : preset),
       })
       const toggleBasics = () => update({ ...draft, keepDshBasics: draft.keepDshBasics !== true })
+      const toggleMechanics = () => update({ ...draft, keepDshMechanics: draft.keepDshMechanics !== true })
       const addPreset = () => {
         const id = nextPresetId(draft.customs)
         update({
@@ -972,6 +981,7 @@ window.__ModuleLoader__.load({
           { op: 'set', path: ['presets'], value: presets },
           { op: 'set', path: ['defaultPreset'], value: draft.defaultPreset },
           { op: 'set', path: ['keepDshBasics'], value: draft.keepDshBasics === true },
+          { op: 'set', path: ['keepDshMechanics'], value: draft.keepDshMechanics !== false },
         ], revision)
           .then((ok) => {
             setBusy(false)
@@ -1033,6 +1043,22 @@ window.__ModuleLoader__.load({
             t('settings.makeDefault'),
           ),
           h('span'),
+        ),
+      )
+
+      const mechanicsCard = h('div', { className: 'dsh-pp-card', key: 'mechanics' },
+        h('div', { className: 'dsh-pp-card-head' },
+          h('h3', { className: 'dsh-pp-card-title' }, t('settings.mechanicsTitle')),
+        ),
+        h('p', { className: 'dsh-pp-card-desc' }, t('settings.mechanicsDescription')),
+        h('label', { className: 'dsh-pp-checkbox' },
+          h('input', {
+            type: 'checkbox',
+            checked: draft.keepDshMechanics !== false,
+            disabled: busy,
+            onChange: toggleMechanics,
+          }),
+          t('settings.mechanicsToggle'),
         ),
       )
 
@@ -1109,6 +1135,7 @@ window.__ModuleLoader__.load({
         h('h2', { className: 'dsh-pp-settings-title' }, t('settings.title')),
         h('p', { className: 'dsh-pp-settings-desc' }, t('settings.description')),
         builtinCard,
+        mechanicsCard,
         basicsCard,
         h('div', { className: 'dsh-pp-section-head' },
           h('div', null,

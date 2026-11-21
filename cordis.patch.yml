@@ -14,17 +14,21 @@
         # Prepend the short DSH preamble (identity, tool guidance, environment
         # pointer) to every custom preset. The Settings page also edits it.
         keepDshBasics: true
+        # Keep DSH's non-persona operating sections (plan mode, PTC, tool
+        # guidance, web safety, file references, MCP instructions) after a
+        # custom preset. Set false for an exact whole-prompt replacement.
+        keepDshMechanics: true
         presets:
           # Reserved built-in entry: leaves DSH's assembled system prompt
           # untouched. The Settings page keeps it and clears any text.
           - id: default
             label: DSH 原有提示词
             text: ''
-          # Uncomment to seed a custom preset. A custom preset's text REPLACES
-          # the whole system prompt (identity, tool guidance, and environment
-          # facts included), so write a complete prompt rather than an
-          # addition. The short DSH preamble above is prepended unless
-          # keepDshBasics is false. The text must not be empty.
+          # Uncomment to seed a custom preset. A custom preset replaces DSH's
+          # persona/identity; DSH's runtime sections are kept unless
+          # keepDshMechanics is false. The short DSH preamble above is
+          # prepended unless keepDshBasics is false. The text must not be
+          # empty.
           # - id: concise
           #   label: 简洁
           #   text: |
