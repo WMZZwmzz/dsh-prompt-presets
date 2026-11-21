@@ -1,0 +1,32 @@
+# The Host row and the browser bundle of the prompt-presets plugin.
+#
+# Presets are normally edited in 设置 → 系统提示词预设 (Settings → Prompt presets)
+# and saved to this profile automatically. The values below are the shipped
+# defaults and the base layer those edits sit on. Restart DSH after changing
+# this file.
+- insert:
+    - id: prompt-presets
+      name: '@local/prompt-presets'
+      config:
+        # Session preset used when a session has not recorded a choice, and the
+        # fallback when a stored preset was removed from this list.
+        defaultPreset: default
+        # Prepend the short DSH preamble (identity, tool guidance, environment
+        # pointer) to every custom preset. The Settings page also edits it.
+        keepDshBasics: true
+        presets:
+          # Reserved built-in entry: leaves DSH's assembled system prompt
+          # untouched. The Settings page keeps it and clears any text.
+          - id: default
+            label: DSH 原有提示词
+            text: ''
+          # Uncomment to seed a custom preset. A custom preset's text REPLACES
+          # the whole system prompt (identity, tool guidance, and environment
+          # facts included), so write a complete prompt rather than an
+          # addition. The short DSH preamble above is prepended unless
+          # keepDshBasics is false. The text must not be empty.
+          # - id: concise
+          #   label: 简洁
+          #   text: |
+          #     你是一个简洁的编程助手。先给出结论，再给必要的要点，避免重复、
+          #     客套和填充内容；需要工具时直接调用，不要先询问。

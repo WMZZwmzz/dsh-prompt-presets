@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "Prompt presets",
+    "description": "Adds a preset chip to the right of the composer's permission control and a Prompt presets page in Settings. Picking a preset affects the current session only; it applies from the next model request on, and each session records its own choice in its log. The built-in DSH original prompt entry changes nothing, so it means DSH's original system prompt. A custom preset's text replaces the whole system prompt (including DSH's identity, tool guidance, and environment facts) instead of appending to it, so write a complete prompt; by default a short DSH preamble (identity, tool guidance, and environment pointer) is prepended, and it can be turned off in Settings. Edits saved on the Settings page are written to the current profile; the preset marked as default starts new sessions, and the current session is switched from the preset chip in the composer. Each switch leaves one command receipt in the transcript (like the built-in /permission switch). A recorded preset removed from the config falls back to the default and the menu says so. Subagent sessions keep DSH's original system prompt and do not use custom presets. If the session's agent preset declares a complete persona (for example the minimal preset), that persona replaces the whole system prompt and this plugin's preset is not used. Switching rewrites the system prompt, so cached request prefixes may be invalidated.",
+    "detail": "docs/DETAIL.md"
+  }
+}

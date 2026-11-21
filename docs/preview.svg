@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="300" viewBox="0 0 640 300" fill="none">
+  <!-- Composer card: empty input area, send action, and the tool row -->
+  <rect x="40" y="130" width="368" height="140" rx="18" stroke="#9AA1AD" stroke-width="2"/>
+  <rect x="66" y="152" width="2.5" height="28" rx="1.25" fill="#5B7CFA"/>
+  <circle cx="372" cy="166" r="13" fill="#5B7CFA"/>
+  <path d="M367 166h10M372 161l5 5-5 5" stroke="#EFF2FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Tool row: permission chip, prompt-preset chip, commands plus -->
+  <rect x="64" y="228" width="92" height="28" rx="8" stroke="#AEB5C0" stroke-width="1.6"/>
+  <rect x="78" y="239" width="60" height="6" rx="3" fill="#AEB5C0" fill-opacity="0.75"/>
+
+  <rect x="170" y="228" width="132" height="28" rx="8" stroke="#5B7CFA" stroke-width="2" fill="#5B7CFA" fill-opacity="0.1"/>
+  <rect x="184" y="233" width="18" height="14" rx="3.2" stroke="#5B7CFA" stroke-width="1.6"/>
+  <path d="M188 238h8M188 242h5" stroke="#5B7CFA" stroke-width="1.6" stroke-linecap="round"/>
+  <rect x="212" y="239" width="58" height="6" rx="3" fill="#5B7CFA" fill-opacity="0.8"/>
+  <path d="M283 239.5l4 4 4-4" stroke="#5B7CFA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <path d="M332 233v18M323 242h18" stroke="#AEB5C0" stroke-width="1.8" stroke-linecap="round"/>
+
+  <!-- Preset menu opening upward from the chip, over the composer card -->
+  <rect x="170" y="38" width="180" height="166" rx="14" fill="#7C8494" fill-opacity="0.22" stroke="#9AA1AD" stroke-width="1.6"/>
+  <rect x="186" y="56" width="58" height="6" rx="3" fill="#AEB5C0" fill-opacity="0.7"/>
+
+  <rect x="178" y="74" width="164" height="28" rx="7" fill="#5B7CFA" fill-opacity="0.14"/>
+  <path d="M187 88l3 3.5 5.5-6.5" stroke="#5B7CFA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="208" y="85" width="96" height="6" rx="3" fill="#5B7CFA" fill-opacity="0.85"/>
+
+  <rect x="178" y="106" width="164" height="28" rx="7"/>
+  <rect x="208" y="117" width="76" height="6" rx="3" fill="#AEB5C0" fill-opacity="0.6"/>
+
+  <path d="M186 146h148" stroke="#AEB5C0" stroke-width="1.2" stroke-opacity="0.6"/>
+  <rect x="186" y="158" width="120" height="5" rx="2.5" fill="#AEB5C0" fill-opacity="0.45"/>
+</svg>
