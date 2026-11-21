@@ -1,5 +1,7 @@
 # Prompt presets
 
+English | [中文](README.zh.md)
+
 Adds a system-prompt preset chip to the right of the composer's permission control, plus a **Prompt presets** page in Settings. Picking a preset affects the current session only; from the next model request on, a custom preset's text replaces DSH's assembled prompt (optionally prefixed by a short DSH preamble), rather than extending it.
 
 ![The preset chip beside the composer permission control, with its menu open](docs/preview.svg)
