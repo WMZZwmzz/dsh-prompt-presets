@@ -206,6 +206,7 @@ test('prompt sections: replace identity/persona and preserve DSH mechanics by de
   assert.equal(isReplacedSection('deployment:persona-prefix'), true)
   assert.equal(isReplacedSection('deployment:persona-suffix'), true)
   assert.equal(isReplacedSection('deployment:persona-extra'), true)
+  assert.equal(isReplacedSection('persona'), true)
   assert.equal(isReplacedSection('plan:policy'), false)
   assert.equal(isReplacedSection('tool:read'), false)
   assert.equal(isReplacedSection(null), false)
